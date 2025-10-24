@@ -2,6 +2,36 @@
 
 AI-Powered Energy Management Platform
 
+What it does
+Powerlytics is an AI-powered energy optimization platform that collects real-time smart meter data, automates ingestion via Fivetran, and stores it in BigQuery for large-scale analytics. From there, Vertex AI models forecast demand spikes, detect anomalies, and suggest efficiency improvements.
+
+Users access an interactive Next.js dashboard that visualizes usage patterns and includes a conversational AI assistant (powered by Gemini) that can answer questions like:
+
+“Why did my usage spike yesterday?” “How can I reduce peak-time consumption?”
+
+How we built it
+- Data Ingestion: Smart meter data streams through a custom Fivetran connector built with the Connector SDK.
+- Data Warehouse: Data lands in Google BigQuery, where it’s transformed into analytics-ready tables.
+- Machine Learning: Vertex AI trains models for consumption prediction and anomaly detection.
+- Backend: A FastAPI service handles API requests, runs Vertex predictions, and queries BigQuery.
+- Frontend: Built with Next.js, featuring charts (Recharts.js) and a chat UI integrated with Gemini APIs for natural-language analysis.
+- Deployment: Containerized with Docker, hosted on Cloud Run, fully integrated with Google Cloud IAM and logging.
+
+## Features
+
+✅ Real-time energy monitoring  
+✅ AI-powered forecasting  
+✅ Anomaly detection  
+✅ Conversational AI assistant  
+✅ Cost optimization recommendations  
+
+## Tech Stack
+
+- Frontend: Next.js, React, Tailwind CSS, Recharts
+- Backend: FastAPI, Python
+- Data: BigQuery, Vertex AI
+- Cloud: Google Cloud Platform
+
 ## Quick Start
 
 ### 1. Install Dependencies
@@ -48,26 +78,3 @@ ecogrid-iq/
 └── scripts/          # Data ingestion scripts
 ```
 
-## Features
-
-✅ Real-time energy monitoring  
-✅ AI-powered forecasting  
-✅ Anomaly detection  
-✅ Conversational AI assistant  
-✅ Cost optimization recommendations  
-
-## Tech Stack
-
-- Frontend: Next.js, React, Tailwind CSS, Recharts
-- Backend: FastAPI, Python
-- Data: BigQuery, Vertex AI
-- Cloud: Google Cloud Platform
-
-## Next Steps
-
-1. Set up Google Cloud Project (for full backend)
-2. Create BigQuery dataset
-3. Deploy to Cloud Run
-4. Record demo video
-
-See documentation for detailed setup instructions.
