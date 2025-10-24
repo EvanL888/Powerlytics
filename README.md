@@ -1,4 +1,4 @@
-# 🔋 EcoGridIQ
+# 🔋 Powerlytics
 
 AI-Powered Energy Management Platform
 
