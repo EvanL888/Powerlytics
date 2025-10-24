@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoGridIQ - Energy Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h2 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .device-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .device {
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .device:hover {
+            background: #edf2f7;
+            border-color: #667eea;
+        }
+        
+        .device.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .device-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .device-id {
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .stat {
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+        
+        .stat-label {
+            font-size: 0.85em;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-unit {
+            font-size: 0.7em;
+            color: #718096;
+            margin-left: 4px;
+        }
+        
+        .readings-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        tr:hover {
+            background: #f7fafc;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .status.online {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .status.offline {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+        
+        .error {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.2s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔋 EcoGridIQ</h1>
+            <p>AI-Powered Energy Management Platform</p>
+        </div>
+        
+        <div class="dashboard">
+            <!-- Devices Card -->
+            <div class="card">
+                <h2>📱 Smart Devices</h2>
+                <div id="device-list" class="device-list">
+                    <div class="loading">Loading devices...</div>
+                </div>
+            </div>
+            
+            <!-- Stats Card -->
+            <div class="card">
+                <h2>📊 Current Statistics</h2>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-label">Current Power</div>
+                        <div class="stat-value" id="current-power">--</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Voltage</div>
+                        <div class="stat-value" id="current-voltage">--</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Temperature</div>
+                        <div class="stat-value" id="current-temp">--</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Total Energy</div>
+                        <div class="stat-value" id="total-energy">--</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- API Status Card -->
+            <div class="card">
+                <h2>🌐 API Status</h2>
+                <div id="api-status">
+                    <div class="loading">Checking API...</div>
+                </div>
+                <button onclick="refreshData()" style="margin-top: 15px; width: 100%;">🔄 Refresh Data</button>
+            </div>
+        </div>
+        
+        <!-- Readings Table -->
+        <div class="card">
+            <h2>📈 Recent Energy Readings</h2>
+            <div id="readings-container" class="readings-table">
+                <div class="loading">Loading readings...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let selectedDevice = null;
+        let devices = [];
+
+        // Fetch devices from API
+        async function loadDevices() {
+            try {
+                const response = await fetch(`${API_URL}/devices`);
+                if (!response.ok) throw new Error('Failed to fetch devices');
+                
+                const data = await response.json();
+                devices = data.devices;
+                
+                const deviceList = document.getElementById('device-list');
+                deviceList.innerHTML = devices.map(device => `
+                    <div class="device" onclick="selectDevice('${device.device_id}')">
+                        <div class="device-name">${device.name}</div>
+                        <div class="device-id">${device.device_id} • ${device.location}</div>
+                    </div>
+                `).join('');
+                
+                // Auto-select first device
+                if (devices.length > 0) {
+                    selectDevice(devices[0].device_id);
+                }
+            } catch (error) {
+                document.getElementById('device-list').innerHTML = `
+                    <div class="error">❌ Error loading devices: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Select a device and load its readings
+        async function selectDevice(deviceId) {
+            selectedDevice = deviceId;
+            
+            // Update active state
+            document.querySelectorAll('.device').forEach((el, idx) => {
+                el.classList.toggle('active', devices[idx]?.device_id === deviceId);
+            });
+            
+            await loadReadings(deviceId);
+        }
+
+        // Load readings for selected device
+        async function loadReadings(deviceId) {
+            try {
+                document.getElementById('readings-container').innerHTML = '<div class="loading">Loading readings...</div>';
+                
+                const response = await fetch(`${API_URL}/readings?device_id=${deviceId}`);
+                if (!response.ok) throw new Error('Failed to fetch readings');
+                
+                const data = await response.json();
+                const readings = data.data || [];
+                
+                // Update stats with latest reading
+                if (readings.length > 0) {
+                    const latest = readings[readings.length - 1];
+                    document.getElementById('current-power').innerHTML = `${latest.power_w.toFixed(1)}<span class="stat-unit">W</span>`;
+                    document.getElementById('current-voltage').innerHTML = `${latest.voltage.toFixed(1)}<span class="stat-unit">V</span>`;
+                    document.getElementById('current-temp').innerHTML = `${latest.temp_c.toFixed(1)}<span class="stat-unit">°C</span>`;
+                    
+                    const totalEnergy = readings.reduce((sum, r) => sum + r.energy_wh, 0);
+                    document.getElementById('total-energy').innerHTML = `${(totalEnergy / 1000).toFixed(2)}<span class="stat-unit">kWh</span>`;
+                }
+                
+                // Display readings table (show last 10)
+                const recentReadings = readings.slice(-10).reverse();
+                document.getElementById('readings-container').innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Power (W)</th>
+                                <th>Energy (Wh)</th>
+                                <th>Voltage (V)</th>
+                                <th>Temp (°C)</th>
+                                <th>Occupancy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${recentReadings.map(reading => `
+                                <tr>
+                                    <td>${new Date(reading.timestamp).toLocaleString()}</td>
+                                    <td>${reading.power_w.toFixed(2)}</td>
+                                    <td>${reading.energy_wh.toFixed(2)}</td>
+                                    <td>${reading.voltage.toFixed(1)}</td>
+                                    <td>${reading.temp_c.toFixed(1)}</td>
+                                    <td>
+                                        <span class="status ${reading.occupancy ? 'online' : 'offline'}">
+                                            ${reading.occupancy ? '✓ Yes' : '✗ No'}
+                                        </span>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <p style="margin-top: 15px; color: #718096; font-size: 0.9em;">
+                        Showing ${recentReadings.length} of ${readings.length} total readings
+                    </p>
+                `;
+            } catch (error) {
+                document.getElementById('readings-container').innerHTML = `
+                    <div class="error">❌ Error loading readings: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Check API status
+        async function checkAPIStatus() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                if (!response.ok) throw new Error('API not responding');
+                
+                const data = await response.json();
+                document.getElementById('api-status').innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="status online">✓ Online</span>
+                        <span style="color: #718096; font-size: 0.9em;">
+                            ${new Date(data.timestamp).toLocaleString()}
+                        </span>
+                    </div>
+                    <p style="margin-top: 10px; color: #718096; font-size: 0.9em;">
+                        Mock API running on ${API_URL}
+                    </p>
+                `;
+            } catch (error) {
+                document.getElementById('api-status').innerHTML = `
+                    <div class="error">
+                        <strong>❌ API Offline</strong><br>
+                        ${error.message}<br>
+                        <small>Make sure Flask server is running on port 5000</small>
+                    </div>
+                `;
+            }
+        }
+
+        // Refresh all data
+        async function refreshData() {
+            await Promise.all([
+                loadDevices(),
+                checkAPIStatus()
+            ]);
+            
+            if (selectedDevice) {
+                await loadReadings(selectedDevice);
+            }
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshData();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(refreshData, 30000);
+        });
+    </script>
+</body>
+</html>

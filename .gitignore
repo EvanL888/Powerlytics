@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+
+# Node
+node_modules/
+.next/
+out/
+*.log
+.vercel
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# GCP
+*.json
+!package.json
+!tsconfig.json
